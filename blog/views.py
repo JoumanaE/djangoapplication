@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from django.shortcuts import render, get_object_or_404
 from .models import Post
 from .forms import PostForm
 from django.shortcuts import redirect 
+from django.shortcuts import render, get_object_or_404
 
 def post_list(request):
-	return render(request, 'blog/post_list.html', {})
+    posts = Post.objects.order_by('title') 
+    return render(request, 'blog/post_list.html', {'posts': posts})
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -18,7 +19,6 @@ def post_new(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.published_date = timezone.now()
             post.save()
             return redirect('post_detail', pk=post.pk)
     else:
@@ -33,7 +33,6 @@ def post_edit(request, pk):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.published_date = timezone.now()
             post.save()
             return redirect('post_detail', pk=post.pk)
     else:
@@ -41,4 +40,3 @@ def post_edit(request, pk):
     return render(request, 'blog/post_edit.html', {'form': form})
 
 
-    
